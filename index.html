@@ -2,17 +2,38 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8" />
-  <title>스마트 신발 센서 데이터</title>
+  <title>스마트 신발 센서 시스템</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    #dataSection { display: none; margin-top: 20px; }
+    #backBtn { margin-top: 20px; }
+    .bar {
+      height: 20px;
+      background: green;
+      transition: width 0.3s;
+    }
+    #status {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>스마트 신발 센서 확인</h1>
+  <h1>스마트 신발 센서 메뉴</h1>
 
-  <button onclick="connectAndReadPressure()">1. 압력 센서 보기</button>
-  <button onclick="connectAndReadGyro()">2. 운동 상태 보기</button>
-  <button onclick="connectAndReadBattery()">3. 배터리 잔량 보기</button>
+  <div id="status">연결 상태: 🔌 미연결</div>
 
-  <p id="status">연결 상태: ⛔ 미연결</p>
-  <div id="data">📊 센서 데이터가 여기에 표시됩니다.</div>
+  <div id="menu">
+    <button onclick="connectAndReadPressure()">압력 센서 보기</button>
+    <button onclick="connectAndReadGyro()">운동 상태 보기</button>
+    <button onclick="connectAndReadBattery()">배터리 상태 보기</button>
+  </div>
+
+  <div id="dataSection">
+    <div id="data">데이터를 불러오는 중...</div>
+    <div id="batteryBar" style="margin-top:10px;"></div>
+    <button id="backBtn" onclick="showMenu()">← 돌아가기</button>
+  </div>
 
   <script src="script.js"></script>
 </body>
