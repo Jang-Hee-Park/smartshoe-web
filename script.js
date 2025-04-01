@@ -17,8 +17,8 @@ async function connectToDevice() {
 
     document.getElementById("status").innerText = "연결 상태: ✅ 연결됨";
   } catch (error) {
-    alert("BLE 연결 실패! 기기를 확인하세요.");
-    console.error(error);
+    console.error("BLE 연결 실패:", error);
+    document.getElementById("status").innerText = "연결 상태: 🔌 미연결 (BLE 실패)";
   }
 }
 
@@ -45,35 +45,54 @@ function showMenu() {
 }
 
 async function connectAndReadPressure() {
-  if (!pressureChar) await connectToDevice();
-  const value = await pressureChar.readValue();
-  const text = new TextDecoder().decode(value);
+  showData("압력 센서 데이터를 불러오는 중...");
+  try {
+    if (!pressureChar) await connectToDevice();
+    const value = await pressureChar.readValue();
+    const text = new TextDecoder().decode(value);
 
-  // 예시 포맷: "R:30,21,25;F:10,12"
-  const [rPart, fPart] = text.split(";");
-  const [heel, fore1, fore2] = rPart.replace("R:", "").split(",");
-  const [mid1, mid2] = fPart.replace("F:", "").split(",");
+    // 예시: "R:30,20,28;F:10,11"
+    const [rPart, fPart] = text.split(";");
+    const [heel, fore1, fore2] = rPart.replace("R:", "").split(",");
+    const [mid1, mid2] = fPart.replace("F:", "").split(",");
 
-  const content = `
-    <strong>발꿈치 압력:</strong> ${heel} kg<br>
-    <strong>전족부1 센서 압력:</strong> ${fore1} kg<br>
-    <strong>전족부2 센서 압력:</strong> ${fore2} kg<br>
-    <strong>중족부1 센서 압력:</strong> ${mid1} kg<br>
-    <strong>중족부2 센서 압력:</strong> ${mid2} kg
-  `;
-  showData(content);
+    const content = `
+      <strong>발꿈치 압력:</strong> ${heel} kg<br>
+      <strong>전족부1 센서 압력:</strong> ${fore1} kg<br>
+      <strong>전족부2 센서 압력:</strong> ${fore2} kg<br>
+      <strong>중족부1 센서 압력:</strong> ${mid1} kg<br>
+      <strong>중족부2 센서 압력:</strong> ${mid2} kg
+    `;
+    document.getElementById("data").innerHTML = content;
+
+  } catch (error) {
+    document.getElementById("data").innerHTML = "❗ 센서와 연결되지 않았습니다. BLE 기기를 확인해주세요.";
+    console.error(error);
+  }
 }
 
 async function connectAndReadGyro() {
-  if (!gyroChar) await connectToDevice();
-  const value = await gyroChar.readValue();
-  const text = new TextDecoder().decode(value);
-  showData(`<strong>운동 상태:</strong> ${text}`);
+  showData("운동 상태 데이터를 불러오는 중...");
+  try {
+    if (!gyroChar) await connectToDevice();
+    const value = await gyroChar.readValue();
+    const text = new TextDecoder().decode(value);
+    showData(`<strong>운동 상태:</strong> ${text}`);
+  } catch (error) {
+    document.getElementById("data").innerHTML = "❗ 자이로 센서 연결 실패";
+    console.error(error);
+  }
 }
 
 async function connectAndReadBattery() {
-  if (!batteryChar) await connectToDevice();
-  const value = await batteryChar.readValue();
-  const percent = parseInt(new TextDecoder().decode(value));
-  showData("<strong>배터리 잔량</strong>", percent);
+  showData("배터리 상태를 불러오는 중...");
+  try {
+    if (!batteryChar) await connectToDevice();
+    const value = await batteryChar.readValue();
+    const percent = parseInt(new TextDecoder().decode(value));
+    showData("<strong>배터리 잔량</strong>", percent);
+  } catch (error) {
+    document.getElementById("data").innerHTML = "❗ 배터리 센서 연결 실패";
+    console.error(error);
+  }
 }
